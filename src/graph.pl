@@ -16,31 +16,30 @@ __DATA__
     %= stylesheet 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.css'
   </head>
   <body>
-    <h2>Weighted DiGraph</h2>
-    %= input_tag 'nodes', placeholder => 'Nro de nodos', id => 'nodos'
-    %= input_tag 'edges', placeholder => 'Patron de aristas'
+    <h2>Grafo</h2>
+    <meta charset="utf-8"/>
+    %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
+    %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
     %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
     %= tag 'div', id => 'mynetwork'
     %= javascript begin
        function renderGraph() {
-        var nd = document.getElementById("nodos");
-        var g = new jsgraphs.WeightedDiGraph(nd.value);
-        g.addEdge(new jsgraphs.Edge(0, 1, 5.0));
-        g.addEdge(new jsgraphs.Edge(0, 4, 9.0));
-        g.addEdge(new jsgraphs.Edge(0, 7, 8.0));
-        g.addEdge(new jsgraphs.Edge(1, 2, 12.0));
-        g.addEdge(new jsgraphs.Edge(1, 3, 15.0));
-        g.addEdge(new jsgraphs.Edge(1, 7, 4.0));
-        g.addEdge(new jsgraphs.Edge(2, 3, 3.0));
-        g.addEdge(new jsgraphs.Edge(2, 6, 11.0));
-        g.addEdge(new jsgraphs.Edge(3, 6, 9.0));
-        g.addEdge(new jsgraphs.Edge(4, 5, 5.0));
-        g.addEdge(new jsgraphs.Edge(4, 6, 20.0));
-        g.addEdge(new jsgraphs.Edge(4, 7, 5.0));
-        g.addEdge(new jsgraphs.Edge(5, 2, 1.0));
-        g.addEdge(new jsgraphs.Edge(5, 6, 13.0));
-        g.addEdge(new jsgraphs.Edge(7, 5, 6.0));
-        g.addEdge(new jsgraphs.Edge(7, 2, 7.0));
+        // get number of nodes
+        var nodes= document.getElementById("nodes");
+        var g = new jsgraphs.WeightedDiGraph(nodes.value);
+        // get edges info
+        var pattern = document.getElementById("edges").value;
+        console.log(pattern);
+
+        var aristas = pattern.split(" ");
+        console.log(aristas);
+
+
+        for(let p = 0; p < aristas.length; ++p){
+            let parameters = aristas[p].split("-");
+            console.log(parameters);
+            g.addEdge(new jsgraphs.Edge(parameters[0], parameters[1] , parameters[2]));
+        }
 
 
         var dijkstra = new jsgraphs.Dijkstra(g, 0);
