@@ -21,7 +21,6 @@ __DATA__
     %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
     %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
     %= input_tag 'start', placeholder => 'Start', id => 'start'
-    %= input_tag 'end', placeholder => 'End', id => 'end'
     %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
     %= tag 'div', id => 'mynetwork'
     %= javascript begin
@@ -41,12 +40,10 @@ __DATA__
         for(let p = 0; p < aristas.length; ++p){
             let parameters = aristas[p].split("-");
             console.log(parameters);
-            g.addEdge(new jsgraphs.Edge(parameters[0], parameters[1] , parameters[2]));
+            g.addEdge(new jsgraphs.Edge(parseInt(parameters[0]), parseInt(parameters[1]) , parseInt(parameters[2])));
         }
 
         var start = document.getElementById("start").value;
-        var end = document.getElementById("end").value;
-
         var dijkstra = new jsgraphs.Dijkstra(g, start);
 
 
@@ -99,8 +96,8 @@ __DATA__
             };
         }
 
-        console.log(g.V); // display 6, which is the number of vertices in g
-        console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
+        //console.log(g.V); // display 6, which is the number of vertices in g
+        //console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
 
         var nodes = new vis.DataSet(g_nodes);
 
