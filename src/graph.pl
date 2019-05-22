@@ -20,46 +20,53 @@ __DATA__
     <meta charset="utf-8"/>
     %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
     %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
+    %= input_tag 'start', placeholder => 'Start', id => 'start'
+    %= input_tag 'end', placeholder => 'End', id => 'end'
     %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
     %= tag 'div', id => 'mynetwork'
     %= javascript begin
        function renderGraph() {
+
+
         // get number of nodes
         var nodes= document.getElementById("nodes");
         var g = new jsgraphs.WeightedDiGraph(nodes.value);
+
+
         // get edges info
         var pattern = document.getElementById("edges").value;
         console.log(pattern);
-
         var aristas = pattern.split(" ");
         console.log(aristas);
-
-
         for(let p = 0; p < aristas.length; ++p){
             let parameters = aristas[p].split("-");
             console.log(parameters);
             g.addEdge(new jsgraphs.Edge(parameters[0], parameters[1] , parameters[2]));
         }
 
+        var start = document.getElementById("start").value;
+        var end = document.getElementById("end").value;
 
-        var dijkstra = new jsgraphs.Dijkstra(g, 0);
+        var dijkstra = new jsgraphs.Dijkstra(g, start);
 
 
 
         var g_nodes = [];
         var g_edges = [];
         for(var v=0; v < g.V; ++v){
-            g.node(v).label = 'Node ' + v; // assigned 'Node {v}' as label for node v
+            g.node(v).label = 'Nodo ' + v; // assigned 'Node {v}' as label for node v
             g_nodes.push({
                 id: v,
                 label: g.node(v).label
             });
         }
 
+
+
         for(var v = 1; v < g.V; ++v){
             if(dijkstra.hasPathTo(v)){
                 var path = dijkstra.pathTo(v);
-                console.log('=====path from 0 to ' + v + ' start==========');
+                console.log('=====path from ' + start + ' to ' + v + ' start==========');
                 for(var i = 0; i < path.length; ++i) {
                     var e = path[i];
                     console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
@@ -72,7 +79,7 @@ __DATA__
                         color: '#00ff00'
                     });
                 }
-                console.log('=====path from 0 to ' + v + ' end==========');
+                console.log('=====path from ' + start + ' to ' + v + ' end==========');
                 console.log('=====distance: '  + dijkstra.distanceTo(v) + '=========');
             }
         }
