@@ -1,73 +1,85 @@
 <html lang="es">
 <head>
     <title>Grafos</title>
-    <meta charset="utf-8"/>
     <script src="https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.js"></script>
     <script src="https://rawgit.com/chen0040/js-graph-algorithms/master/src/jsgraphs.js"></script>
     <link href="https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.css" rel="stylesheet">
 </head>
 <body>
-<h2>Weighted DiGraph</h2>
-<input id="nodes" name="nodes" placeholder="#Nodes">
-<input id="edges" name="edges" placeholder="#Pattern">
+<h2>Grafo</h2>
+<meta charset="utf-8"/>
+<input id="nodes" name="nodes" placeholder="#Nodos">
+<input id="edges" name="edges" placeholder="#Edges">
+<input id="start" name="start" placeholder="Start">
 <input id="render" onclick="renderGraph()" type="submit" value="Generar">
 <div id="mynetwork"></div>
 <script>//<![CDATA[
 
 function renderGraph() {
-    // get info of nodes
-    var nodes = document.getElementById("nodes");
+
+
+    // get number of nodes
+    var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
 
-    // get info of edges
+
+    // get edges info
     var pattern = document.getElementById("edges").value;
     console.log(pattern);
-
     var aristas = pattern.split(" ");
     console.log(aristas);
-
-
     for(let p = 0; p < aristas.length; ++p){
         let parameters = aristas[p].split("-");
         console.log(parameters);
-        g.addEdge(new jsgraphs.Edge(parameters[0], parameters[1] , parameters[2]));
+        g.addEdge(new jsgraphs.Edge(parseInt(parameters[0]), parseInt(parameters[1]) , parseInt(parameters[2])));
     }
-
-
-    var dijkstra = new jsgraphs.Dijkstra(g, 0);
-
-
+    var start = document.getElementById("start").value;
 
     var g_nodes = [];
     var g_edges = [];
+
+    if (start.trim() == '') {
+        console.log("Graph Without Dijkstra")
+    } else {
+        var dijkstra = new jsgraphs.Dijkstra(g, start);
+
+        for(var v = 0; v < g.V; ++v){
+            if(dijkstra.hasPathTo(v)){
+                var path = dijkstra.pathTo(v);
+                console.log('=====path from ' + start + ' to ' + v + ' start==========');
+                for(var i = 0; i < path.length; ++i) {
+                    var e = path[i];
+                    console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
+                    g_edges.push({
+                        from: e.from(),
+                        to: e.to(),
+                        length: e.weight,
+                        label: '' + e.weight,
+                        arrows:'to',
+                        color: '#00ff00'
+                    });
+                }
+                console.log('=====path from ' + start + ' to ' + v + ' end==========');
+                console.log('=====distance: '  + dijkstra.distanceTo(v) + '=========');
+            }
+        }
+    }
+
+
+
+
+
     for(var v=0; v < g.V; ++v){
-        g.node(v).label = 'Node ' + v; // assigned 'Node {v}' as label for node v
+        g.node(v).label = 'Nodo ' + v; // assigned 'Node {v}' as label for node v
         g_nodes.push({
             id: v,
             label: g.node(v).label
         });
     }
 
-    for(var v = 1; v < g.V; ++v){
-        if(dijkstra.hasPathTo(v)){
-            var path = dijkstra.pathTo(v);
-            console.log('=====path from 0 to ' + v + ' start==========');
-            for(var i = 0; i < path.length; ++i) {
-                var e = path[i];
-                console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
-                g_edges.push({
-                    from: e.from(),
-                    to: e.to(),
-                    length: e.weight,
-                    label: '' + e.weight,
-                    arrows:'to',
-                    color: '#00ff00'
-                });
-            }
-            console.log('=====path from 0 to ' + v + ' end==========');
-            console.log('=====distance: '  + dijkstra.distanceTo(v) + '=========');
-        }
-    }
+
+
+
 
     for(var v=0; v < g.V; ++v) {
         var adj_v = g.adj(v);
@@ -84,8 +96,8 @@ function renderGraph() {
         };
     }
 
-    console.log(g.V); // display 6, which is the number of vertices in g
-    console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
+    //console.log(g.V); // display 6, which is the number of vertices in g
+    //console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
 
     var nodes = new vis.DataSet(g_nodes);
 
