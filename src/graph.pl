@@ -25,42 +25,30 @@ __DATA__
     %= tag 'div', id => 'mynetwork'
     %= javascript begin
        function renderGraph() {
-
-
         // get number of nodes
-        var nodes= document.getElementById("nodes");
-        var g = new jsgraphs.WeightedDiGraph(nodes.value);
+    var nodes= document.getElementById("nodes");
+    var g = new jsgraphs.WeightedDiGraph(nodes.value);
+    // get edges info
+    var pattern = document.getElementById("edges").value;
+    console.log(pattern);
+    var aristas = pattern.split(" ");
+    console.log(aristas);
+    for(let p = 0; p < aristas.length; ++p){
+        let parameters = aristas[p].split("-");
+        console.log(parameters);
+        g.addEdge(new jsgraphs.Edge(parseInt(parameters[0]), parseInt(parameters[1]) , parseInt(parameters[2])));
+    }
+    var start = document.getElementById("start").value;
 
+    var g_nodes = [];
+    var g_edges = [];
 
-        // get edges info
-        var pattern = document.getElementById("edges").value;
-        console.log(pattern);
-        var aristas = pattern.split(" ");
-        console.log(aristas);
-        for(let p = 0; p < aristas.length; ++p){
-            let parameters = aristas[p].split("-");
-            console.log(parameters);
-            g.addEdge(new jsgraphs.Edge(parseInt(parameters[0]), parseInt(parameters[1]) , parseInt(parameters[2])));
-        }
-
-        var start = document.getElementById("start").value;
+    if (start.trim() === '') {
+        console.log("Graph Without Dijkstra")
+    } else {
         var dijkstra = new jsgraphs.Dijkstra(g, start);
 
-
-
-        var g_nodes = [];
-        var g_edges = [];
-        for(var v=0; v < g.V; ++v){
-            g.node(v).label = 'Nodo ' + v; // assigned 'Node {v}' as label for node v
-            g_nodes.push({
-                id: v,
-                label: g.node(v).label
-            });
-        }
-
-
-
-        for(var v = 1; v < g.V; ++v){
+        for(var v = 0; v < g.V; ++v){
             if(dijkstra.hasPathTo(v)){
                 var path = dijkstra.pathTo(v);
                 console.log('=====path from ' + start + ' to ' + v + ' start==========');
@@ -80,38 +68,47 @@ __DATA__
                 console.log('=====distance: '  + dijkstra.distanceTo(v) + '=========');
             }
         }
+    }
 
-        for(var v=0; v < g.V; ++v) {
-            var adj_v = g.adj(v);
-            for(var i = 0; i < adj_v.length; ++i) {
-                var e = adj_v[i];
-                var w = e.other(v);
-                g_edges.push({
-                    from: v,
-                    to: w,
-                    length: e.weight,
-                    label: '' + e.weight,
-                    arrows:'to'
-                });
-            };
-        }
+    for(var v=0; v < g.V; ++v){
+        g.node(v).label = 'Nodo ' + v; // assigned 'Node {v}' as label for node v
+        g_nodes.push({
+            id: v,
+            label: g.node(v).label
+        });
+    }
 
-        //console.log(g.V); // display 6, which is the number of vertices in g
-        //console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
-
-        var nodes = new vis.DataSet(g_nodes);
-
-        // create an array with edges
-        var edges = new vis.DataSet(g_edges);
-
-        // create a network
-        var container = document.getElementById('mynetwork');
-        var data = {
-            nodes: nodes,
-            edges: edges
+    for(var v=0; v < g.V; ++v) {
+        var adj_v = g.adj(v);
+        for(var i = 0; i < adj_v.length; ++i) {
+            var e = adj_v[i];
+            var w = e.other(v);
+            g_edges.push({
+                from: v,
+                to: w,
+                length: e.weight,
+                label: '' + e.weight,
+                arrows:'to'
+            });
         };
-        var options = {};
-        var network = new vis.Network(container, data, options);
+    }
+
+    //console.log(g.V); // display 6, which is the number of vertices in g
+    //console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
+
+    var nodes = new vis.DataSet(g_nodes);
+
+    // create an array with edges
+    var edges = new vis.DataSet(g_edges);
+
+    // create a network
+    var container = document.getElementById('mynetwork');
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {};
+    var network = new vis.Network(container, data, options);
     }
     % end
 </body>
