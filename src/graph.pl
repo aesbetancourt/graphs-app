@@ -14,17 +14,43 @@ __DATA__
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.js'
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/src/jsgraphs.js'
     %= stylesheet 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.css'
+    %= stylesheet begin
+        textarea {
+            resize: none;
+        }
+        #inputs{
+            position: relative;
+            width: 400px;
+            border-style: solid;
+            height: 95vh;
+            top: 2px;
+            padding-left: 20px;
+        }
+        #mynetwork{
+            border-style: solid;
+            position: absolute;
+            top: 10px;
+            left: 30%;
+            height: 95vh;
+            width: 123vh;
+        }
+    % end
   </head>
   <body>
-    <h2>Grafo</h2>
     <meta charset="utf-8"/>
-    %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
-    %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
-    %= input_tag 'start', placeholder => 'Start', id => 'start'
-    %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
+    <%= tag div => (id => 'inputs') => begin %>
+        <h1>Grafos dirigidos</h1>
+        %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
+        %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
+        %= input_tag 'start', placeholder => 'Start', id => 'start'
+        %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
+        %= tag 'br'
+        %= text_area 'dijkstra', cols => 40, rows => 40, id => 'dijkstra'
+    <% end %>
     %= tag 'div', id => 'mynetwork'
     %= javascript begin
        function renderGraph() {
+       document.getElementById("dijkstra").value = "Made with ❤ for a better web. ";
         // get number of nodes
     var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
