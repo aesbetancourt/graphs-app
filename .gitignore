@@ -33,3 +33,17 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+\.idea/codeStyles/Project\.xml
+
+\.idea/dbnavigator\.xml
+
+\.idea/graphs-app\.iml
+
+\.idea/misc\.xml
+
+\.idea/modules\.xml
+
+\.idea/perl5local\.xml
+
+\.idea/vcs\.xml
