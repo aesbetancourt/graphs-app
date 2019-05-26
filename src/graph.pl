@@ -9,10 +9,9 @@ __DATA__
 
 @@ index.html.ep
 <html lang="es">
-%= t header => begin
+%= t head => begin
     %= t meta => charset => 'utf-8'
-%end
-    <title>Grafos</title>
+    %= t title => 'Algoritmo de Dijkstra'
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.js'
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/src/jsgraphs.js'
     %= stylesheet 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.css'
@@ -37,22 +36,21 @@ __DATA__
             width: 123vh;
         }
     % end
+%end
   <body>
     <%= tag div => (id => 'inputs') => begin %>
         <h1>Grafos dirigidos</h1>
-        % my $value;
-        %= input_tag 'nodes', placeholder => '#Nodo', id => 'nodes', value=>"$value"
+        %= input_tag 'nodes', placeholder => '#Nodo', id => 'nodes'
         %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
         %= input_tag 'start', placeholder => 'Start', id => 'start'
         %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
         %= tag 'br'
-        %= text_area 'dijkstra', cols => 40, rows => 40, id => 'dijkstra'
+        %= text_area 'dijkstra', cols => 40, rows => 20, id => 'dijkstra'
     <% end %>
     %= tag 'div', id => 'mynetwork'
 
     %= javascript begin
        function renderGraph() {
-        //document.getElementById("dijkstra").value = "Made with ❤ for a better web. ";
         // get number of nodes
     var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
@@ -68,24 +66,22 @@ __DATA__
         g.addEdge(new jsgraphs.Edge(parseInt(parameters[0]), parseInt(parameters[1]) , parseInt(parameters[2])));
     }
     var start = document.getElementById("start").value;
-
     var g_nodes = [];
     var g_edges = [];
 
+    var values = '';
     if (start.trim() === '') {
         document.getElementById("dijkstra").value = "Graph Without Dijkstra";
-        console.log("Graph Without Dijkstra")
     } else {
         var dijkstra = new jsgraphs.Dijkstra(g, start);
-        var values = '';
+
         for(var v = 0; v < g.V; ++v){
             if(dijkstra.hasPathTo(v)){
                 var path = dijkstra.pathTo(v);
-                values += ('=====path from ' + start + ' to ' + v + ' start==========');
-
+                values += ('=====Ruta desde ' + start + ' hasta ' + v +'\n');
                 for(var i = 0; i < path.length; ++i) {
                     var e = path[i];
-                    console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
+                    values += (e.from() + ' => ' + e.to() + ': ' + e.weight + '\n');
                     g_edges.push({
                         from: e.from(),
                         to: e.to(),
@@ -95,8 +91,8 @@ __DATA__
                         color: '#00ff00'
                     });
                 }
-                    values += ('=====path from ' + start + ' to ' + v + ' end==========');
-                    values += ('=====distance: '  + dijkstra.distanceTo(v) + '=========');
+                    //values += ('=====path from ' + start + ' to ' + v + ' end==========');
+                    values += ('=====Distancia: '  + dijkstra.distanceTo(v) + '=========\n');
             }
         }
     }
@@ -124,9 +120,6 @@ __DATA__
         };
     }
 
-    //console.log(g.V); // display 6, which is the number of vertices in g
-    //console.log(g.adj(0)); // display [5, 1, 2], which is the adjacent list to vertex 0
-
     var nodes = new vis.DataSet(g_nodes);
 
     // create an array with edges
@@ -140,6 +133,9 @@ __DATA__
     };
     var options = {};
     var network = new vis.Network(container, data, options);
+    if (values === ''){
+        values = 'Nodo inicial no especificado. Dijkstra no calculado';
+    }
     document.getElementById("dijkstra").value = values;
     }
     % end
