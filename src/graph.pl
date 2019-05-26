@@ -9,7 +9,9 @@ __DATA__
 
 @@ index.html.ep
 <html lang="es">
-  <head>
+%= t header => begin
+    %= t meta => charset => 'utf-8'
+%end
     <title>Grafos</title>
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/third-party-libs/vis/vis.js'
     %= javascript 'https://rawgit.com/chen0040/js-graph-algorithms/master/src/jsgraphs.js'
@@ -35,12 +37,11 @@ __DATA__
             width: 123vh;
         }
     % end
-  </head>
   <body>
-    <meta charset="utf-8"/>
     <%= tag div => (id => 'inputs') => begin %>
         <h1>Grafos dirigidos</h1>
-        %= input_tag 'nodes', placeholder => '#Nodos', id => 'nodes'
+        % my $value;
+        %= input_tag 'nodes', placeholder => '#Nodo', id => 'nodes', value=>"$value"
         %= input_tag 'edges', placeholder => '#Edges', id => 'edges'
         %= input_tag 'start', placeholder => 'Start', id => 'start'
         %= submit_button 'Generar', id => 'render', onclick => 'renderGraph()'
@@ -48,12 +49,14 @@ __DATA__
         %= text_area 'dijkstra', cols => 40, rows => 40, id => 'dijkstra'
     <% end %>
     %= tag 'div', id => 'mynetwork'
+
     %= javascript begin
        function renderGraph() {
-       document.getElementById("dijkstra").value = "Made with ❤ for a better web. ";
+        //document.getElementById("dijkstra").value = "Made with ❤ for a better web. ";
         // get number of nodes
     var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
+
     // get edges info
     var pattern = document.getElementById("edges").value;
     console.log(pattern);
@@ -70,14 +73,16 @@ __DATA__
     var g_edges = [];
 
     if (start.trim() === '') {
+        document.getElementById("dijkstra").value = "Graph Without Dijkstra";
         console.log("Graph Without Dijkstra")
     } else {
         var dijkstra = new jsgraphs.Dijkstra(g, start);
-
+        var values = '';
         for(var v = 0; v < g.V; ++v){
             if(dijkstra.hasPathTo(v)){
                 var path = dijkstra.pathTo(v);
-                console.log('=====path from ' + start + ' to ' + v + ' start==========');
+                values += ('=====path from ' + start + ' to ' + v + ' start==========');
+
                 for(var i = 0; i < path.length; ++i) {
                     var e = path[i];
                     console.log(e.from() + ' => ' + e.to() + ': ' + e.weight);
@@ -90,8 +95,8 @@ __DATA__
                         color: '#00ff00'
                     });
                 }
-                console.log('=====path from ' + start + ' to ' + v + ' end==========');
-                console.log('=====distance: '  + dijkstra.distanceTo(v) + '=========');
+                    values += ('=====path from ' + start + ' to ' + v + ' end==========');
+                    values += ('=====distance: '  + dijkstra.distanceTo(v) + '=========');
             }
         }
     }
@@ -135,6 +140,7 @@ __DATA__
     };
     var options = {};
     var network = new vis.Network(container, data, options);
+    document.getElementById("dijkstra").value = values;
     }
     % end
 </body>
