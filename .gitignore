@@ -47,3 +47,5 @@ inc/
 \.idea/perl5local\.xml
 
 \.idea/vcs\.xml
+
+\.idea/workspace\.xml
