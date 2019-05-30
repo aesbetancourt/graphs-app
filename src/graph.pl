@@ -1,14 +1,13 @@
 use strict;
 use warnings FATAL => 'all';
 use Mojolicious::Lite;
-use Graph::Dijkstra;
 use Data::Dumper;
 
 # Definimos las rutas del servidor local (local:8080 o local:3000)
 get '/' => 'index';
 
 # Definimos una nueva instancia de un grafo dirigido
-my $graph = Graph::Dijkstra->new( {edgedefault=>'directed'} );
+my $grafo;
 
 # Cargamos los paramteros del grafo en una funcion que luego sera llamada
 
@@ -17,22 +16,23 @@ my $graph = Graph::Dijkstra->new( {edgedefault=>'directed'} );
      my @nodos = (0..$nodos);
 
      foreach(@nodos){
-         $graph->node( {id=>$nodos, label=>"$nodos"} );
+         $grafo->node( {id=>$nodos, label=>"$nodos"} );
      }
      my @aristas = (0..$aristas);
      foreach(@aristas){
-        $graph->edge( {sourceID=>$inicio, targetID=>$destino, weight=>$peso} );
+        $grafo->edge( {sourceID=>$inicio, targetID=>$destino, weight=>$peso} );
      }
      dijkstra($inicio, $destino, $peso);
  }
 
 # Enviar calculos hechos por sub dijkstra
+
 sub render {
     dijkstra();
     my %Solution = ();
     # Calculamos la menor ruta del nodo origen a las demas rutas
     %Solution = ( originID=>1 , destinationID=>2 );
-    if ( my $pathCost = $graph->shortestPath(\%Solution) ) {
+    if ( my $pathCost = $grafo->shortestPath(\%Solution) ) {
         print "=====Ruta desde $Solution{originID} hasta $Solution{destinationID}\n=====Distancia$Solution{weight}=========";
         foreach my $edgeHref (@{$Solution{edges}}) {
             print "\tsourceID='$edgeHref->{sourceID}' ='$edgeHref->{targetID}'=>'$edgeHref->{weight}'\n";
