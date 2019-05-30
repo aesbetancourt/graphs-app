@@ -123,8 +123,9 @@ __DATA__
     %= tag 'div', id => 'mynetwork'
 
     %= javascript begin
-       function renderGraph() {
-        // get number of nodes
+
+function renderGraph() {
+    // get number of nodes
     var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
 
@@ -158,23 +159,24 @@ __DATA__
                     g_edges.push({
                         from: e.from(),
                         to: e.to(),
-                        length: e.weight,
+                        length: 200,
                         label: '' + e.weight,
                         arrows:'to',
-                        color: '#00ff00'
+                        color: '#0378A6'
                     });
                 }
-                    //values += ('=====path from ' + start + ' to ' + v + ' end==========');
-                    values += ('=====Distancia: '  + dijkstra.distanceTo(v) + '=========\n');
+                //values += ('=====path from ' + start + ' to ' + v + ' end==========');
+                values += ('=====Distancia: '  + dijkstra.distanceTo(v) + '=========\n');
             }
         }
     }
 
     for(var v=0; v < g.V; ++v){
-        g.node(v).label = 'Nodo ' + v; // assigned 'Node {v}' as label for node v
+        g.node(v).label = v; // assigned 'Node {v}' as label for node v
         g_nodes.push({
             id: v,
-            label: g.node(v).label
+            label: g.node(v).label,
+            color: '#FFF'
         });
     }
 
@@ -186,9 +188,11 @@ __DATA__
             g_edges.push({
                 from: v,
                 to: w,
-                length: e.weight,
+                length: 200,
                 label: '' + e.weight,
-                arrows:'to'
+                arrows:'to',
+                color: '#BAB3B3',
+                value: 2
             });
         };
     }
@@ -204,13 +208,23 @@ __DATA__
         nodes: nodes,
         edges: edges
     };
-    var options = {};
+    var options = {
+        layout: {
+            improvedLayout: true
+        },
+        nodes: {
+            font: {
+                size: 25
+            }
+        },
+};
     var network = new vis.Network(container, data, options);
     if (values === ''){
         values = 'Nodo inicial no especificado. Dijkstra no calculado';
     }
     document.getElementById("dijkstra").value = values;
-    }
+}
+
     % end
 </body>
 </html>
