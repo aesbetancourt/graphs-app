@@ -1,10 +1,97 @@
 use strict;
 use warnings FATAL => 'all';
 use Mojolicious::Lite;
+use Graph::Dijkstra;
+use Data::Dumper;
 
+# Definimos las rutas del servidor local (local:8080 o local:3000)
 get '/' => 'index';
 
+# Definimos una nueva instancia de un grafo dirigido
+my $graph = Graph::Dijkstra->new( {edgedefault=>'directed'} );
+
+# Cargamos los paramteros del grafo en una funcion que luego sera llamada
+
+ sub crearGrafo {
+     my ($nodos, $aristas, $inicio, $peso, $destino) = @_;
+     my @nodos = (0..$nodos);
+
+     foreach(@nodos){
+         $graph->node( {id=>$nodos, label=>"$nodos"} );
+     }
+     my @aristas = (0..$aristas);
+     foreach(@aristas){
+        $graph->edge( {sourceID=>$inicio, targetID=>$destino, weight=>$peso} );
+     }
+     dijkstra($inicio, $destino, $peso);
+ }
+
+# Enviar calculos hechos por sub dijkstra
+sub render {
+    dijkstra();
+    my %Solution = ();
+    # Calculamos la menor ruta del nodo origen a las demas rutas
+    %Solution = ( originID=>1 , destinationID=>2 );
+    if ( my $pathCost = $graph->shortestPath(\%Solution) ) {
+        print "=====Ruta desde $Solution{originID} hasta $Solution{destinationID}\n=====Distancia$Solution{weight}=========";
+        foreach my $edgeHref (@{$Solution{edges}}) {
+            print "\tsourceID='$edgeHref->{sourceID}' ='$edgeHref->{targetID}'=>'$edgeHref->{weight}'\n";
+        }
+    }
+}
+# Colocar nodos en el array dijkstra
+sub push_Nodos {
+    my ($g, $a, $b, $weight) = @_;
+    $g->{$a} ||= {name => $a};
+    $g->{$b} ||= {name => $b};
+    push @{$g->{$a}{edges}}, {weight => $weight, vertex => $g->{$b}};
+}
+# Establecer prioridad de nodos y luego añadir en un array de dijkstra
+sub push_prioridad {
+    my ($a, $v) = @_;
+    my $i = 0;
+    my $j = $#{$a};
+    while ($i <= $j) {
+        my $k = int(($i + $j) / 2);
+        if ($a->[$k]{dist} >= $v->{dist}) {
+            $j = $k - 1;
+        }
+        else {
+            $i = $k + 1;
+        }
+    }
+    splice @$a, $i, 0, $v;
+}
+# Calculos dijkstra
+sub dijkstra {
+    push_Nodos();
+    my ($g, $a, $b) = @_;
+    for my $v (values %$g) {
+        $v->{dist} = 9999999;
+        delete $v->{prev};
+        delete $v->{visited};
+    }
+    push_prioridad();
+    $g->{$a}{dist} = 0;
+    my $h = [];
+    while (1) {
+        my $v = shift @$h;
+        last if !$v || $v->{name} eq $b;
+        $v->{visited} = 1;
+        for my $e (@{$v->{edges}}) {
+            my $u = $e->{vertex};
+            if (!$u->{visited} && $v->{dist} + $e->{weight} <= $u->{dist}) {
+                $u->{prev} = $v;
+                $u->{dist} = $v->{dist} + $e->{weight};
+            }
+        }
+    }
+    render;
+}
+# Iniciamos el servidor con los datos cargados
 app->start;
+
+
 __DATA__
 
 @@ index.html.ep
@@ -125,13 +212,11 @@ __DATA__
     %= javascript begin
 
 function renderGraph() {
-    // get number of nodes
     var nodes= document.getElementById("nodes");
     var g = new jsgraphs.WeightedDiGraph(nodes.value);
-
-    // get edges info
+    // Obtener info del grafo y pasarlo a perl
     var pattern = document.getElementById("edges").value;
-    console.log(pattern);
+    //console.log(pattern);
     var aristas = pattern.split(" ");
     console.log(aristas);
     for(let p = 0; p < aristas.length; ++p){
@@ -199,10 +284,10 @@ function renderGraph() {
 
     var nodes = new vis.DataSet(g_nodes);
 
-    // create an array with edges
+    // Crear un areglo con la aristas
     var edges = new vis.DataSet(g_edges);
 
-    // create a network
+    // Crear Network para renderixar el grafo
     var container = document.getElementById('mynetwork');
     var data = {
         nodes: nodes,
