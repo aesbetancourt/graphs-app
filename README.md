@@ -7,4 +7,4 @@
 
 ## Screenshot
 - Dijkstra
-![](docs/grafos.png)
+![](docs/grafos.png).
